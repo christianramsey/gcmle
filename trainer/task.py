@@ -1,8 +1,6 @@
-
 import tensorflow as tf
 import model
 import argparse
-
 
 
 if __name__ == '__main__':
