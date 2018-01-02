@@ -1,7 +1,4 @@
 import tensorflow as tf
-import tensorflow.contrib.eager as tfe
-
-tfe.enable_eager_execution()
 
 # our data doesn't have column names or an explicit y,
 # we will define the header here to get ready to ingest the data
