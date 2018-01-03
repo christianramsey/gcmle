@@ -70,3 +70,44 @@ def linear_model(output_dir):
     all.update(sparse)
     return tflearn.LinearClassifier(model_dir=output_dir,
                                     feature_columns=all.values())
+
+
+def serving_input_fn():
+    real, sparse = get_features()
+
+    feature_placeholders = {
+        key: tf.placeholder(tf.float32, [None]) \
+        for key in real.keys()
+    }
+    feature_placeholders.update({
+        key: tf.placeholder(tf.string, [None]) \
+        for key in sparse.keys()
+    })
+
+    features = {
+        # tf.expand_dims will insert a dimension 1 into tensor shape
+        # This will make the input tensor a batch of 1
+        key: tf.expand_dims(tensor, -1)
+        for key, tensor in feature_placeholders.items()
+    }
+    return tflearn.utils.input_fn_utils.InputFnOps(
+        features,
+        None,
+        feature_placeholders)
+
+
+def make_experiment_fn(traindata, evaldata, **args):
+  def _experiment_fn(output_dir):
+    return tflearn.Experiment(
+        linear_model(output_dir),
+        train_input_fn=read_dataset(traindata,
+        mode=tf.contrib.learn.ModeKeys.TRAIN),
+        eval_input_fn=read_dataset(evaldata),
+        export_strategies=[saved_model_export_utils.make_export_strategy(
+            serving_input_fn,
+            default_output_alternative_key=None,
+            exports_to_keep=1
+        )],
+        **args
+    )
+  return _experiment_fn
