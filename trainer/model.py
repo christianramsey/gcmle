@@ -1,5 +1,6 @@
 import tensorflow as tf
 import tensorflow.contrib.layers as tflayers
+import tensorflow.contrib.learn as tflearn
 
 # our data doesn't have column names or an explicit y,
 # we will define the header here to get ready to ingest the data
@@ -56,3 +57,10 @@ def get_features():
     return real, sparse
 
 
+def linear_model(output_dir):
+    real, sparse = get_features()
+    all = {}
+    all.update(real)
+    all.update(sparse)
+    return tflearn.LinearClassifier(model_dir=output_dir,
+                                    feature_columns=all.values())
