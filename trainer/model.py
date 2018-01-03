@@ -120,6 +120,7 @@ def serving_input_fn():
 
 def my_rmse(predictions, labels, **args):
   prob_ontime = predictions[:,1]
+  print('--------------------------prob_ontime: ',prob_ontime)
   return tfmetrics.streaming_root_mean_squared_error(prob_ontime,
                        labels, **args)
 
