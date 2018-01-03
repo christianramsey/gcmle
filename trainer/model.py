@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow.contrib.layers as tflayers
 
 # our data doesn't have column names or an explicit y,
 # we will define the header here to get ready to ingest the data
@@ -33,3 +34,25 @@ def read_dataset(filename, mode=tf.contrib.learn.ModeKeys.EVAL,
     label = features.pop(LABEL_COLUMN)
 
     return features, label
+
+
+def get_features():
+    real = {
+      colname : tflayers.real_valued_column(colname) \
+          for colname in \
+            ('dep_delay,taxiout,distance,avg_dep_delay,avg_arr_delay' +
+             ',dep_lat,dep_lon,arr_lat,arr_lon').split(',')
+    }
+    sparse = {
+      'carrier': tflayers.sparse_column_with_keys('carrier',
+                 keys='AS,VX,F9,UA,US,WN,HA,EV,MQ,DL,OO,B6,NK,AA'.split(',')),
+
+      'origin' : tflayers.sparse_column_with_hash_bucket('origin',
+                 hash_bucket_size=1000), # FIXME
+
+      'dest'   : tflayers.sparse_column_with_hash_bucket('dest',
+                 hash_bucket_size=1000)  # FIXME
+    }
+    return real, sparse
+
+
