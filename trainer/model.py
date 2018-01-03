@@ -96,6 +96,30 @@ def serving_input_fn():
         feature_placeholders)
 
 
+def serving_input_fn():
+    real, sparse = get_features()
+
+    feature_placeholders = {
+        key: tf.placeholder(tf.float32, [None]) \
+        for key in real.keys()
+    }
+    feature_placeholders.update({
+        key: tf.placeholder(tf.string, [None]) \
+        for key in sparse.keys()
+    })
+
+    features = {
+        # tf.expand_dims will insert a dimension 1 into tensor shape
+        # This will make the input tensor a batch of 1
+        key: tf.expand_dims(tensor, -1)
+        for key, tensor in feature_placeholders.items()
+    }
+    return tflearn.utils.input_fn_utils.InputFnOps(
+        features,
+        None,
+        feature_placeholders)
+
+
 def make_experiment_fn(traindata, evaldata, **args):
   def _experiment_fn(output_dir):
     return tflearn.Experiment(
