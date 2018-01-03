@@ -64,8 +64,9 @@ def linear_model(output_dir):
     all = {}
     all.update(real)
     all.update(sparse)
-    return tflearn.LinearClassifier(model_dir=output_dir,
-                                    feature_columns=all.values())
+    estimator = tflearn.LinearClassifier(model_dir=output_dir, feature_columns=all.values())
+    estimator.params["head"]._thresholds = [0.7]
+    return estimator
 
 
 def serving_input_fn():
