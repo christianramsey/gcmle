@@ -2,6 +2,7 @@ import tensorflow as tf
 import tensorflow.contrib.layers as tflayers
 import tensorflow.contrib.learn as tflearn
 from tensorflow.contrib.learn.python.learn.utils import saved_model_export_utils
+import tensorflow.contrib.metrics as tfmetrics
 
 # our data doesn't have column names or an explicit y,
 # we will define the header here to get ready to ingest the data
@@ -117,6 +118,11 @@ def serving_input_fn():
         None,
         feature_placeholders)
 
+def my_rmse(predictions, labels, **args):
+  prob_ontime = predictions[:,1]
+  return tfmetrics.streaming_root_mean_squared_error(prob_ontime,
+                       labels, **args)
+
 
 def make_experiment_fn(traindata, evaldata, **args):
 
@@ -127,6 +133,10 @@ def make_experiment_fn(traindata, evaldata, **args):
         train_input_fn=read_dataset(traindata,
         mode=tf.contrib.learn.ModeKeys.TRAIN),
         eval_input_fn=read_dataset(evaldata),
+        eval_metrics={
+            'rmse': tflearn.MetricSpec(metric_fn=my_rmse,
+                                       prediction_key='probabilities')
+        },
         export_strategies=[saved_model_export_utils.make_export_strategy(
             serving_input_fn,
             default_output_alternative_key=None,
