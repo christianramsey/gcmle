@@ -176,7 +176,7 @@ node {
         dtype: DT_STRING
         tensor_shape {
         }
-        string_val: "../data/train.csv"
+        string_val: "/Users/cramsey/Downloads/data-science-on-gcp-master/gcmle/data/train.csv"
       }
     }
   }
@@ -1732,7 +1732,7 @@ node {
   }
 }
 node {
-  name: "IsVariableInitialized"
+  name: "global_step/IsVariableInitialized"
   op: "IsVariableInitialized"
   input: "global_step"
   attr {
@@ -1760,10 +1760,10 @@ node {
   }
 }
 node {
-  name: "cond/Switch"
+  name: "global_step/cond/Switch"
   op: "Switch"
-  input: "IsVariableInitialized"
-  input: "IsVariableInitialized"
+  input: "global_step/IsVariableInitialized"
+  input: "global_step/IsVariableInitialized"
   attr {
     key: "T"
     value {
@@ -1783,9 +1783,9 @@ node {
   }
 }
 node {
-  name: "cond/switch_t"
+  name: "global_step/cond/switch_t"
   op: "Identity"
-  input: "cond/Switch:1"
+  input: "global_step/cond/Switch:1"
   attr {
     key: "T"
     value {
@@ -1803,9 +1803,9 @@ node {
   }
 }
 node {
-  name: "cond/switch_f"
+  name: "global_step/cond/switch_f"
   op: "Identity"
-  input: "cond/Switch"
+  input: "global_step/cond/Switch"
   attr {
     key: "T"
     value {
@@ -1823,9 +1823,9 @@ node {
   }
 }
 node {
-  name: "cond/pred_id"
+  name: "global_step/cond/pred_id"
   op: "Identity"
-  input: "IsVariableInitialized"
+  input: "global_step/IsVariableInitialized"
   attr {
     key: "T"
     value {
@@ -1843,10 +1843,30 @@ node {
   }
 }
 node {
-  name: "cond/read/Switch"
+  name: "global_step/cond/read"
+  op: "Identity"
+  input: "global_step/cond/read/Switch:1"
+  attr {
+    key: "T"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "global_step/cond/read/Switch"
   op: "RefSwitch"
   input: "global_step"
-  input: "cond/pred_id"
+  input: "global_step/cond/pred_id"
   attr {
     key: "T"
     value {
@@ -1874,30 +1894,10 @@ node {
   }
 }
 node {
-  name: "cond/read"
-  op: "Identity"
-  input: "cond/read/Switch:1"
-  attr {
-    key: "T"
-    value {
-      type: DT_INT64
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "cond/Switch_1"
+  name: "global_step/cond/Switch_1"
   op: "Switch"
   input: "global_step/Initializer/zeros"
-  input: "cond/pred_id"
+  input: "global_step/cond/pred_id"
   attr {
     key: "T"
     value {
@@ -1925,10 +1925,10 @@ node {
   }
 }
 node {
-  name: "cond/Merge"
+  name: "global_step/cond/Merge"
   op: "Merge"
-  input: "cond/Switch_1"
-  input: "cond/read"
+  input: "global_step/cond/Switch_1"
+  input: "global_step/cond/read"
   attr {
     key: "N"
     value {
@@ -1954,7 +1954,7 @@ node {
   }
 }
 node {
-  name: "add/y"
+  name: "global_step/add/y"
   op: "Const"
   attr {
     key: "_output_shapes"
@@ -1984,10 +1984,10 @@ node {
   }
 }
 node {
-  name: "add"
+  name: "global_step/add"
   op: "Add"
-  input: "cond/Merge"
-  input: "add/y"
+  input: "global_step/cond/Merge"
+  input: "global_step/add/y"
   attr {
     key: "T"
     value {
@@ -2224,7 +2224,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:9"
   input: "linear/arr_lat/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -2262,7 +2261,6 @@ node {
 node {
   name: "linear/linear/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -2549,7 +2547,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:10"
   input: "linear/arr_lon/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -2587,7 +2584,6 @@ node {
 node {
   name: "linear/linear/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -2874,7 +2870,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:5"
   input: "linear/avg_arr_delay/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -2912,7 +2907,6 @@ node {
 node {
   name: "linear/linear/Reshape_2/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -3199,7 +3193,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:4"
   input: "linear/avg_dep_delay/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -3237,7 +3230,6 @@ node {
 node {
   name: "linear/linear/Reshape_3/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -3524,7 +3516,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:1"
   input: "linear/dep_delay/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -3562,7 +3553,6 @@ node {
 node {
   name: "linear/linear/Reshape_4/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -3849,7 +3839,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:7"
   input: "linear/dep_lat/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -3887,7 +3876,6 @@ node {
 node {
   name: "linear/linear/Reshape_5/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -4174,7 +4162,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:8"
   input: "linear/dep_lon/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -4212,7 +4199,6 @@ node {
 node {
   name: "linear/linear/Reshape_6/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -4499,7 +4485,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:3"
   input: "linear/distance/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -4537,7 +4522,6 @@ node {
 node {
   name: "linear/linear/Reshape_7/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -4824,7 +4808,6 @@ node {
   op: "MatMul"
   input: "DecodeCSV:2"
   input: "linear/taxiout/weight"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -4862,7 +4845,6 @@ node {
 node {
   name: "linear/linear/Reshape_8/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -4932,7 +4914,6 @@ node {
 node {
   name: "linear/linear/DenseToSparseTensor/ignore_value/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -4992,6 +4973,12 @@ node {
   op: "Where"
   input: "linear/linear/DenseToSparseTensor/NotEqual"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -5041,7 +5028,6 @@ node {
   name: "linear/linear/DenseToSparseTensor/dense_shape"
   op: "Shape"
   input: "DecodeCSV:6"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -5070,7 +5056,6 @@ node {
 node {
   name: "linear/linear/lookup/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5120,7 +5105,6 @@ node {
 node {
   name: "linear/linear/lookup/Size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5151,7 +5135,6 @@ node {
 node {
   name: "linear/linear/lookup/range/start"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5182,7 +5165,6 @@ node {
 node {
   name: "linear/linear/lookup/range/delta"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5267,7 +5249,6 @@ node {
 node {
   name: "linear/linear/lookup/hash_table"
   op: "HashTableV2"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5311,7 +5292,6 @@ node {
 node {
   name: "linear/linear/lookup/hash_table/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5581,7 +5561,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Slice/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5618,7 +5597,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Slice/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5686,7 +5664,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5756,7 +5733,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Gather/indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5906,7 +5882,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/GreaterEqual/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -5963,6 +5938,12 @@ node {
   op: "Where"
   input: "linear/linear/carrier/carrier_weights/GreaterEqual"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -5981,7 +5962,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6146,7 +6126,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/SparseFillEmptyRows/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6221,7 +6200,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/embedding_lookup_sparse/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6258,7 +6236,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/embedding_lookup_sparse/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6295,7 +6272,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/embedding_lookup_sparse/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6538,7 +6514,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6637,7 +6612,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6674,7 +6648,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6711,7 +6684,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6807,7 +6779,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -6990,7 +6961,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Slice_1/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7027,7 +6997,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Slice_1/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7124,7 +7093,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Slice_2/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7161,7 +7129,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/Slice_2/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7229,7 +7196,6 @@ node {
 node {
   name: "linear/linear/carrier/carrier_weights/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7330,7 +7296,6 @@ node {
 node {
   name: "linear/linear/Reshape_9/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7400,7 +7365,6 @@ node {
 node {
   name: "linear/linear/DenseToSparseTensor_1/ignore_value/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7460,6 +7424,12 @@ node {
   op: "Where"
   input: "linear/linear/DenseToSparseTensor_1/NotEqual"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -7509,7 +7479,6 @@ node {
   name: "linear/linear/DenseToSparseTensor_1/dense_shape"
   op: "Shape"
   input: "DecodeCSV:12"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -7750,7 +7719,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Slice/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7787,7 +7755,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Slice/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7855,7 +7822,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -7925,7 +7891,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Gather/indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8075,7 +8040,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/GreaterEqual/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8132,6 +8096,12 @@ node {
   op: "Where"
   input: "linear/linear/dest/dest_weights/GreaterEqual"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -8150,7 +8120,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8315,7 +8284,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/SparseFillEmptyRows/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8390,7 +8358,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/embedding_lookup_sparse/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8427,7 +8394,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/embedding_lookup_sparse/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8464,7 +8430,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/embedding_lookup_sparse/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8707,7 +8672,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8806,7 +8770,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8843,7 +8806,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8880,7 +8842,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -8976,7 +8937,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9159,7 +9119,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Slice_1/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9196,7 +9155,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Slice_1/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9293,7 +9251,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Slice_2/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9330,7 +9287,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/Slice_2/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9398,7 +9354,6 @@ node {
 node {
   name: "linear/linear/dest/dest_weights/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9499,7 +9454,6 @@ node {
 node {
   name: "linear/linear/Reshape_10/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9569,7 +9523,6 @@ node {
 node {
   name: "linear/linear/DenseToSparseTensor_2/ignore_value/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9629,6 +9582,12 @@ node {
   op: "Where"
   input: "linear/linear/DenseToSparseTensor_2/NotEqual"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -9678,7 +9637,6 @@ node {
   name: "linear/linear/DenseToSparseTensor_2/dense_shape"
   op: "Shape"
   input: "DecodeCSV:11"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -9919,7 +9877,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Slice/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -9956,7 +9913,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Slice/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10024,7 +9980,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10094,7 +10049,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Gather/indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10244,7 +10198,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/GreaterEqual/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10301,6 +10254,12 @@ node {
   op: "Where"
   input: "linear/linear/origin/origin_weights/GreaterEqual"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -10319,7 +10278,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10484,7 +10442,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/SparseFillEmptyRows/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10559,7 +10516,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/embedding_lookup_sparse/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10596,7 +10552,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/embedding_lookup_sparse/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10633,7 +10588,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/embedding_lookup_sparse/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10876,7 +10830,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -10975,7 +10928,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11012,7 +10964,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11049,7 +11000,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11145,7 +11095,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11328,7 +11277,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Slice_1/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11365,7 +11313,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Slice_1/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11462,7 +11409,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Slice_2/begin"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11499,7 +11445,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/Slice_2/size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11567,7 +11512,6 @@ node {
 node {
   name: "linear/linear/origin/origin_weights/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -11668,7 +11612,6 @@ node {
 node {
   name: "linear/linear/Reshape_11/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12034,7 +11977,6 @@ node {
 node {
   name: "linear/binary_logistic_head/predictions/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12157,7 +12099,6 @@ node {
 node {
   name: "linear/binary_logistic_head/predictions/classes/dimension"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12492,7 +12433,6 @@ node {
 node {
   name: "linear/binary_logistic_head/log_loss_with_two_classes/loss/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12582,7 +12522,6 @@ node {
 node {
   name: "loss/tags"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12663,7 +12602,6 @@ node {
 node {
   name: "linear/binary_logistic_head/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12700,7 +12638,6 @@ node {
 node {
   name: "linear/binary_logistic_head/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12737,7 +12674,6 @@ node {
 node {
   name: "linear/binary_logistic_head/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12833,7 +12769,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/Shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12865,9 +12800,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/train_op/gradients/Const"
+  name: "linear/binary_logistic_head/train_op/gradients/grad_ys_0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -12899,7 +12833,7 @@ node {
   name: "linear/binary_logistic_head/train_op/gradients/Fill"
   op: "Fill"
   input: "linear/binary_logistic_head/train_op/gradients/Shape"
-  input: "linear/binary_logistic_head/train_op/gradients/Const"
+  input: "linear/binary_logistic_head/train_op/gradients/grad_ys_0"
   attr {
     key: "T"
     value {
@@ -12915,11 +12849,16 @@ node {
       }
     }
   }
+  attr {
+    key: "index_type"
+    value {
+      type: DT_INT32
+    }
+  }
 }
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -13080,7 +13019,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -13114,15 +13052,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Const"
   op: "Const"
-  input: "^add"
-  attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
-    }
-  }
   attr {
     key: "_output_shapes"
     value {
@@ -13174,14 +13103,6 @@ node {
     }
   }
   attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
-    }
-  }
-  attr {
     key: "_output_shapes"
     value {
       list {
@@ -13200,15 +13121,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Const_1"
   op: "Const"
-  input: "^add"
-  attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
-    }
-  }
   attr {
     key: "_output_shapes"
     value {
@@ -13260,14 +13172,6 @@ node {
     }
   }
   attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
-    }
-  }
-  attr {
     key: "_output_shapes"
     value {
       list {
@@ -13286,15 +13190,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Maximum/y"
   op: "Const"
-  input: "^add"
-  attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
-    }
-  }
   attr {
     key: "_output_shapes"
     value {
@@ -13334,14 +13229,6 @@ node {
     }
   }
   attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
-    }
-  }
-  attr {
     key: "_output_shapes"
     value {
       list {
@@ -13360,14 +13247,6 @@ node {
     key: "T"
     value {
       type: DT_INT32
-    }
-  }
-  attr {
-    key: "_class"
-    value {
-      list {
-        s: "loc:@linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/loss_grad/Shape_1"
-      }
     }
   }
   attr {
@@ -13899,7 +13778,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/Log1p_grad/add/x"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes_grad/Reshape_1"
   attr {
     key: "_output_shapes"
@@ -14123,7 +14001,6 @@ node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/binary_logistic_head/log_loss_with_two_classes/mul_grad/Shape_1"
   op: "Shape"
   input: "DecodeCSV"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -16483,7 +16360,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse_grad/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -16520,7 +16396,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse_grad/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -16557,7 +16432,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse_grad/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -16708,6 +16582,12 @@ node {
     }
   }
   attr {
+    key: "Tnumsegments"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -16755,7 +16635,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse_grad/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -16792,7 +16671,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse_grad/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -16829,7 +16707,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse_grad/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -16980,6 +16857,12 @@ node {
     }
   }
   attr {
+    key: "Tnumsegments"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -17027,7 +16910,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse_grad/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17064,7 +16946,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse_grad/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17101,7 +16982,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse_grad/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17252,6 +17132,12 @@ node {
     }
   }
   attr {
+    key: "Tnumsegments"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -17270,7 +17156,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse/embedding_lookup_grad/Shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -17378,7 +17263,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse/embedding_lookup_grad/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17439,7 +17323,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17476,7 +17359,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17513,7 +17395,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17612,7 +17493,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/carrier/carrier_weights/embedding_lookup_sparse/embedding_lookup_grad/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17743,7 +17623,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse/embedding_lookup_grad/Shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -17851,7 +17730,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse/embedding_lookup_grad/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17912,7 +17790,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17949,7 +17826,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -17986,7 +17862,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -18085,7 +17960,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/dest/dest_weights/embedding_lookup_sparse/embedding_lookup_grad/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -18216,7 +18090,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse/embedding_lookup_grad/Shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -18324,7 +18197,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse/embedding_lookup_grad/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -18385,7 +18257,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -18422,7 +18293,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -18459,7 +18329,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse/embedding_lookup_grad/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -18558,7 +18427,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/gradients/linear/linear/origin/origin_weights/embedding_lookup_sparse/embedding_lookup_grad/concat/axis"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -23567,7 +23435,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/learning_rate"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -23598,7 +23465,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/l1_regularization_strength"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -23629,7 +23495,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/l2_regularization_strength"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -23660,7 +23525,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/l2_shrinkage_regularization_strength"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -23691,7 +23555,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/learning_rate_power"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -24224,7 +24087,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/carrier/weights/part_0/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -24269,7 +24131,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/carrier/weights/part_0/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -24314,7 +24175,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/carrier/weights/part_0/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -24437,6 +24297,12 @@ node {
   }
   attr {
     key: "Tindices"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "Tnumsegments"
     value {
       type: DT_INT32
     }
@@ -24601,7 +24467,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/dest/weights/part_0/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -24646,7 +24511,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/dest/weights/part_0/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -24691,7 +24555,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/dest/weights/part_0/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -24814,6 +24677,12 @@ node {
   }
   attr {
     key: "Tindices"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "Tnumsegments"
     value {
       type: DT_INT32
     }
@@ -24978,7 +24847,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/origin/weights/part_0/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -25023,7 +24891,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/origin/weights/part_0/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -25068,7 +24935,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update_linear/origin/weights/part_0/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_class"
     value {
@@ -25191,6 +25057,12 @@ node {
   }
   attr {
     key: "Tindices"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "Tnumsegments"
     value {
       type: DT_INT32
     }
@@ -25320,7 +25192,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/update"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/train_op/Ftrl/update_linear/arr_lat/weight/part_0/ApplyFtrl"
   input: "^linear/binary_logistic_head/train_op/Ftrl/update_linear/arr_lon/weight/part_0/ApplyFtrl"
   input: "^linear/binary_logistic_head/train_op/Ftrl/update_linear/avg_arr_delay/weight/part_0/ApplyFtrl"
@@ -25338,7 +25209,6 @@ node {
 node {
   name: "linear/binary_logistic_head/train_op/Ftrl/value"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/train_op/Ftrl/update"
   attr {
     key: "_class"
@@ -25719,7 +25589,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/mean/Size"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -25776,7 +25645,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/mean/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -25912,9 +25780,29 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean/Greater/y"
+  name: "linear/binary_logistic_head/metrics/mean/truediv"
+  op: "RealDiv"
+  input: "linear/binary_logistic_head/metrics/mean/total/read"
+  input: "linear/binary_logistic_head/metrics/mean/count/read"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/mean/zeros_like"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -25946,7 +25834,7 @@ node {
   name: "linear/binary_logistic_head/metrics/mean/Greater"
   op: "Greater"
   input: "linear/binary_logistic_head/metrics/mean/count/read"
-  input: "linear/binary_logistic_head/metrics/mean/Greater/y"
+  input: "linear/binary_logistic_head/metrics/mean/zeros_like"
   attr {
     key: "T"
     value {
@@ -25959,59 +25847,6 @@ node {
       list {
         shape {
         }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean/truediv"
-  op: "RealDiv"
-  input: "linear/binary_logistic_head/metrics/mean/total/read"
-  input: "linear/binary_logistic_head/metrics/mean/count/read"
-  input: "^add"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean/value/e"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
       }
     }
   }
@@ -26021,59 +25856,7 @@ node {
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean/Greater"
   input: "linear/binary_logistic_head/metrics/mean/truediv"
-  input: "linear/binary_logistic_head/metrics/mean/value/e"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean/Greater_1/y"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean/Greater_1"
-  op: "Greater"
-  input: "linear/binary_logistic_head/metrics/mean/AssignAdd_1"
-  input: "linear/binary_logistic_head/metrics/mean/Greater_1/y"
+  input: "linear/binary_logistic_head/metrics/mean/zeros_like"
   attr {
     key: "T"
     value {
@@ -26112,9 +25895,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean/update_op/e"
+  name: "linear/binary_logistic_head/metrics/mean/zeros_like_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -26143,11 +25925,32 @@ node {
   }
 }
 node {
+  name: "linear/binary_logistic_head/metrics/mean/Greater_1"
+  op: "Greater"
+  input: "linear/binary_logistic_head/metrics/mean/AssignAdd_1"
+  input: "linear/binary_logistic_head/metrics/mean/zeros_like_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
   name: "linear/binary_logistic_head/metrics/mean/update_op"
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean/Greater_1"
   input: "linear/binary_logistic_head/metrics/mean/truediv_1"
-  input: "linear/binary_logistic_head/metrics/mean/update_op/e"
+  input: "linear/binary_logistic_head/metrics/mean/zeros_like_1"
   attr {
     key: "T"
     value {
@@ -26168,7 +25971,6 @@ node {
   name: "linear/binary_logistic_head/metrics/remove_squeezable_dimensions/Squeeze"
   op: "Squeeze"
   input: "DecodeCSV"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -26639,7 +26441,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/accuracy/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -26778,9 +26579,29 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/accuracy/Greater/y"
+  name: "linear/binary_logistic_head/metrics/accuracy/truediv"
+  op: "RealDiv"
+  input: "linear/binary_logistic_head/metrics/accuracy/total/read"
+  input: "linear/binary_logistic_head/metrics/accuracy/count/read"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/accuracy/zeros_like"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -26812,7 +26633,7 @@ node {
   name: "linear/binary_logistic_head/metrics/accuracy/Greater"
   op: "Greater"
   input: "linear/binary_logistic_head/metrics/accuracy/count/read"
-  input: "linear/binary_logistic_head/metrics/accuracy/Greater/y"
+  input: "linear/binary_logistic_head/metrics/accuracy/zeros_like"
   attr {
     key: "T"
     value {
@@ -26825,59 +26646,6 @@ node {
       list {
         shape {
         }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy/truediv"
-  op: "RealDiv"
-  input: "linear/binary_logistic_head/metrics/accuracy/total/read"
-  input: "linear/binary_logistic_head/metrics/accuracy/count/read"
-  input: "^add"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy/value/e"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
       }
     }
   }
@@ -26887,59 +26655,7 @@ node {
   op: "Select"
   input: "linear/binary_logistic_head/metrics/accuracy/Greater"
   input: "linear/binary_logistic_head/metrics/accuracy/truediv"
-  input: "linear/binary_logistic_head/metrics/accuracy/value/e"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy/Greater_1/y"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy/Greater_1"
-  op: "Greater"
-  input: "linear/binary_logistic_head/metrics/accuracy/AssignAdd_1"
-  input: "linear/binary_logistic_head/metrics/accuracy/Greater_1/y"
+  input: "linear/binary_logistic_head/metrics/accuracy/zeros_like"
   attr {
     key: "T"
     value {
@@ -26978,9 +26694,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/accuracy/update_op/e"
+  name: "linear/binary_logistic_head/metrics/accuracy/zeros_like_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -27009,11 +26724,32 @@ node {
   }
 }
 node {
+  name: "linear/binary_logistic_head/metrics/accuracy/Greater_1"
+  op: "Greater"
+  input: "linear/binary_logistic_head/metrics/accuracy/AssignAdd_1"
+  input: "linear/binary_logistic_head/metrics/accuracy/zeros_like_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
   name: "linear/binary_logistic_head/metrics/accuracy/update_op"
   op: "Select"
   input: "linear/binary_logistic_head/metrics/accuracy/Greater_1"
   input: "linear/binary_logistic_head/metrics/accuracy/truediv_1"
-  input: "linear/binary_logistic_head/metrics/accuracy/update_op/e"
+  input: "linear/binary_logistic_head/metrics/accuracy/zeros_like_1"
   attr {
     key: "T"
     value {
@@ -27391,7 +27127,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/mean_1/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -27530,9 +27265,29 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean_1/Greater/y"
+  name: "linear/binary_logistic_head/metrics/mean_1/truediv"
+  op: "RealDiv"
+  input: "linear/binary_logistic_head/metrics/mean_1/total/read"
+  input: "linear/binary_logistic_head/metrics/mean_1/count/read"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/mean_1/zeros_like"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -27564,7 +27319,7 @@ node {
   name: "linear/binary_logistic_head/metrics/mean_1/Greater"
   op: "Greater"
   input: "linear/binary_logistic_head/metrics/mean_1/count/read"
-  input: "linear/binary_logistic_head/metrics/mean_1/Greater/y"
+  input: "linear/binary_logistic_head/metrics/mean_1/zeros_like"
   attr {
     key: "T"
     value {
@@ -27577,59 +27332,6 @@ node {
       list {
         shape {
         }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_1/truediv"
-  op: "RealDiv"
-  input: "linear/binary_logistic_head/metrics/mean_1/total/read"
-  input: "linear/binary_logistic_head/metrics/mean_1/count/read"
-  input: "^add"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_1/value/e"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
       }
     }
   }
@@ -27639,59 +27341,7 @@ node {
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean_1/Greater"
   input: "linear/binary_logistic_head/metrics/mean_1/truediv"
-  input: "linear/binary_logistic_head/metrics/mean_1/value/e"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_1/Greater_1/y"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_1/Greater_1"
-  op: "Greater"
-  input: "linear/binary_logistic_head/metrics/mean_1/AssignAdd_1"
-  input: "linear/binary_logistic_head/metrics/mean_1/Greater_1/y"
+  input: "linear/binary_logistic_head/metrics/mean_1/zeros_like"
   attr {
     key: "T"
     value {
@@ -27730,9 +27380,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean_1/update_op/e"
+  name: "linear/binary_logistic_head/metrics/mean_1/zeros_like_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -27761,11 +27410,32 @@ node {
   }
 }
 node {
+  name: "linear/binary_logistic_head/metrics/mean_1/Greater_1"
+  op: "Greater"
+  input: "linear/binary_logistic_head/metrics/mean_1/AssignAdd_1"
+  input: "linear/binary_logistic_head/metrics/mean_1/zeros_like_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
   name: "linear/binary_logistic_head/metrics/mean_1/update_op"
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean_1/Greater_1"
   input: "linear/binary_logistic_head/metrics/mean_1/truediv_1"
-  input: "linear/binary_logistic_head/metrics/mean_1/update_op/e"
+  input: "linear/binary_logistic_head/metrics/mean_1/zeros_like_1"
   attr {
     key: "T"
     value {
@@ -28092,7 +27762,6 @@ node {
   name: "linear/binary_logistic_head/metrics/mean_2/Size"
   op: "Size"
   input: "DecodeCSV"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -28144,7 +27813,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/mean_2/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -28283,9 +27951,29 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean_2/Greater/y"
+  name: "linear/binary_logistic_head/metrics/mean_2/truediv"
+  op: "RealDiv"
+  input: "linear/binary_logistic_head/metrics/mean_2/total/read"
+  input: "linear/binary_logistic_head/metrics/mean_2/count/read"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/mean_2/zeros_like"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -28317,7 +28005,7 @@ node {
   name: "linear/binary_logistic_head/metrics/mean_2/Greater"
   op: "Greater"
   input: "linear/binary_logistic_head/metrics/mean_2/count/read"
-  input: "linear/binary_logistic_head/metrics/mean_2/Greater/y"
+  input: "linear/binary_logistic_head/metrics/mean_2/zeros_like"
   attr {
     key: "T"
     value {
@@ -28330,59 +28018,6 @@ node {
       list {
         shape {
         }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_2/truediv"
-  op: "RealDiv"
-  input: "linear/binary_logistic_head/metrics/mean_2/total/read"
-  input: "linear/binary_logistic_head/metrics/mean_2/count/read"
-  input: "^add"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_2/value/e"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
       }
     }
   }
@@ -28392,59 +28027,7 @@ node {
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean_2/Greater"
   input: "linear/binary_logistic_head/metrics/mean_2/truediv"
-  input: "linear/binary_logistic_head/metrics/mean_2/value/e"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_2/Greater_1/y"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_2/Greater_1"
-  op: "Greater"
-  input: "linear/binary_logistic_head/metrics/mean_2/AssignAdd_1"
-  input: "linear/binary_logistic_head/metrics/mean_2/Greater_1/y"
+  input: "linear/binary_logistic_head/metrics/mean_2/zeros_like"
   attr {
     key: "T"
     value {
@@ -28483,9 +28066,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean_2/update_op/e"
+  name: "linear/binary_logistic_head/metrics/mean_2/zeros_like_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -28514,11 +28096,32 @@ node {
   }
 }
 node {
+  name: "linear/binary_logistic_head/metrics/mean_2/Greater_1"
+  op: "Greater"
+  input: "linear/binary_logistic_head/metrics/mean_2/AssignAdd_1"
+  input: "linear/binary_logistic_head/metrics/mean_2/zeros_like_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
   name: "linear/binary_logistic_head/metrics/mean_2/update_op"
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean_2/Greater_1"
   input: "linear/binary_logistic_head/metrics/mean_2/truediv_1"
-  input: "linear/binary_logistic_head/metrics/mean_2/update_op/e"
+  input: "linear/binary_logistic_head/metrics/mean_2/zeros_like_1"
   attr {
     key: "T"
     value {
@@ -28845,7 +28448,6 @@ node {
   name: "linear/binary_logistic_head/metrics/mean_3/Size"
   op: "Size"
   input: "DecodeCSV"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -28897,7 +28499,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/mean_3/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29036,9 +28637,29 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean_3/Greater/y"
+  name: "linear/binary_logistic_head/metrics/mean_3/truediv"
+  op: "RealDiv"
+  input: "linear/binary_logistic_head/metrics/mean_3/total/read"
+  input: "linear/binary_logistic_head/metrics/mean_3/count/read"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/mean_3/zeros_like"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29070,7 +28691,7 @@ node {
   name: "linear/binary_logistic_head/metrics/mean_3/Greater"
   op: "Greater"
   input: "linear/binary_logistic_head/metrics/mean_3/count/read"
-  input: "linear/binary_logistic_head/metrics/mean_3/Greater/y"
+  input: "linear/binary_logistic_head/metrics/mean_3/zeros_like"
   attr {
     key: "T"
     value {
@@ -29083,59 +28704,6 @@ node {
       list {
         shape {
         }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_3/truediv"
-  op: "RealDiv"
-  input: "linear/binary_logistic_head/metrics/mean_3/total/read"
-  input: "linear/binary_logistic_head/metrics/mean_3/count/read"
-  input: "^add"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_3/value/e"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
       }
     }
   }
@@ -29145,59 +28713,7 @@ node {
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean_3/Greater"
   input: "linear/binary_logistic_head/metrics/mean_3/truediv"
-  input: "linear/binary_logistic_head/metrics/mean_3/value/e"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_3/Greater_1/y"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/mean_3/Greater_1"
-  op: "Greater"
-  input: "linear/binary_logistic_head/metrics/mean_3/AssignAdd_1"
-  input: "linear/binary_logistic_head/metrics/mean_3/Greater_1/y"
+  input: "linear/binary_logistic_head/metrics/mean_3/zeros_like"
   attr {
     key: "T"
     value {
@@ -29236,9 +28752,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/mean_3/update_op/e"
+  name: "linear/binary_logistic_head/metrics/mean_3/zeros_like_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29267,11 +28782,32 @@ node {
   }
 }
 node {
+  name: "linear/binary_logistic_head/metrics/mean_3/Greater_1"
+  op: "Greater"
+  input: "linear/binary_logistic_head/metrics/mean_3/AssignAdd_1"
+  input: "linear/binary_logistic_head/metrics/mean_3/zeros_like_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
   name: "linear/binary_logistic_head/metrics/mean_3/update_op"
   op: "Select"
   input: "linear/binary_logistic_head/metrics/mean_3/Greater_1"
   input: "linear/binary_logistic_head/metrics/mean_3/truediv_1"
-  input: "linear/binary_logistic_head/metrics/mean_3/update_op/e"
+  input: "linear/binary_logistic_head/metrics/mean_3/zeros_like_1"
   attr {
     key: "T"
     value {
@@ -29292,7 +28828,6 @@ node {
   name: "linear/binary_logistic_head/metrics/Cast_1"
   op: "Cast"
   input: "DecodeCSV"
-  input: "^add"
   attr {
     key: "DstT"
     value {
@@ -29324,7 +28859,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Cast/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29382,7 +28916,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29446,7 +28979,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29477,7 +29009,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29508,7 +29039,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -29622,7 +29152,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -29657,7 +29186,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -29689,7 +29217,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -29721,7 +29248,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -29747,6 +29273,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/auc/Cast/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -29856,34 +29410,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/auc/assert_greater_equal/Assert/AssertGuard/switch_f"
@@ -29944,7 +29470,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Cast_1/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30002,7 +29527,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30066,7 +29590,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30097,7 +29620,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30128,7 +29650,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30242,7 +29763,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -30277,7 +29797,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -30309,7 +29828,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -30341,7 +29859,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -30367,6 +29884,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/auc/Cast_1/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -30476,34 +30021,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/auc/assert_less_equal/Assert/AssertGuard/switch_f"
@@ -30564,7 +30081,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30634,7 +30150,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30733,7 +30248,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30770,7 +30284,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30807,7 +30320,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30903,7 +30415,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -30940,7 +30451,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31010,7 +30520,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31130,7 +30639,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/transpose/sub/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31182,7 +30690,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/transpose/Range/start"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31213,7 +30720,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/transpose/Range/delta"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31326,7 +30832,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Tile_1/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31443,7 +30948,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Tile_2/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -31757,7 +31261,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Sum/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -32086,7 +31589,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Sum_1/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -32415,7 +31917,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Sum_2/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -32744,7 +32245,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Sum_3/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -32849,7 +32349,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/add/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -32906,7 +32405,6 @@ node {
   op: "Add"
   input: "linear/binary_logistic_head/metrics/auc/true_positives/read"
   input: "linear/binary_logistic_head/metrics/auc/false_negatives/read"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -32929,7 +32427,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/add_2/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33010,7 +32507,6 @@ node {
   op: "Add"
   input: "linear/binary_logistic_head/metrics/auc/false_positives/read"
   input: "linear/binary_logistic_head/metrics/auc/true_negatives/read"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -33033,7 +32529,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/add_4/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33112,7 +32607,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_1/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33149,7 +32643,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_1/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33186,7 +32679,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_1/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33285,7 +32777,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_2/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33322,7 +32813,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_2/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33359,7 +32849,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_2/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33482,7 +32971,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_3/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33519,7 +33007,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_3/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33556,7 +33043,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_3/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33655,7 +33141,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_4/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33692,7 +33177,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_4/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33729,7 +33213,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_4/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33852,7 +33335,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/truediv/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -33931,7 +33413,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34001,7 +33482,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/add_6/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34080,7 +33560,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/add_8/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34183,7 +33662,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/add_10/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34262,7 +33740,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_5/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34299,7 +33776,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_5/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34336,7 +33812,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_5/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34435,7 +33910,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_6/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34472,7 +33946,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_6/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34509,7 +33982,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_6/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34632,7 +34104,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_7/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34669,7 +34140,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_7/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34706,7 +34176,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_7/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34805,7 +34274,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_8/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34842,7 +34310,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_8/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -34879,7 +34346,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/strided_slice_8/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35002,7 +34468,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/truediv_1/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35081,7 +34546,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35152,7 +34616,6 @@ node {
   name: "linear/binary_logistic_head/metrics/Cast_2"
   op: "Cast"
   input: "DecodeCSV"
-  input: "^add"
   attr {
     key: "DstT"
     value {
@@ -35184,7 +34647,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Cast/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35242,7 +34704,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35306,7 +34767,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35337,7 +34797,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35368,7 +34827,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35482,7 +34940,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -35517,7 +34974,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -35549,7 +35005,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -35581,7 +35036,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -35607,6 +35061,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/auc_1/Cast/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -35716,34 +35198,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/auc_1/assert_greater_equal/Assert/AssertGuard/switch_f"
@@ -35804,7 +35258,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Cast_1/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35862,7 +35315,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35926,7 +35378,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35957,7 +35408,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -35988,7 +35438,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36102,7 +35551,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -36137,7 +35585,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -36169,7 +35616,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -36201,7 +35647,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -36227,6 +35672,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/auc_1/Cast_1/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -36336,34 +35809,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/auc_1/assert_less_equal/Assert/AssertGuard/switch_f"
@@ -36424,7 +35869,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36494,7 +35938,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36593,7 +36036,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36630,7 +36072,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36667,7 +36108,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36763,7 +36203,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36800,7 +36239,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36870,7 +36308,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -36990,7 +36427,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/transpose/sub/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -37042,7 +36478,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/transpose/Range/start"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -37073,7 +36508,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/transpose/Range/delta"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -37186,7 +36620,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Tile_1/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -37303,7 +36736,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Tile_2/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -37617,7 +37049,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Sum/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -37946,7 +37377,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Sum_1/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -38275,7 +37705,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Sum_2/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -38604,7 +38033,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Sum_3/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -38709,7 +38137,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -38766,7 +38193,6 @@ node {
   op: "Add"
   input: "linear/binary_logistic_head/metrics/auc_1/true_positives/read"
   input: "linear/binary_logistic_head/metrics/auc_1/false_negatives/read"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -38789,7 +38215,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_2/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -38868,7 +38293,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_3/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -38925,7 +38349,6 @@ node {
   op: "Add"
   input: "linear/binary_logistic_head/metrics/auc_1/true_positives/read"
   input: "linear/binary_logistic_head/metrics/auc_1/false_positives/read"
-  input: "^add"
   attr {
     key: "T"
     value {
@@ -38948,7 +38371,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_5/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39027,7 +38449,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_1/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39064,7 +38485,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_1/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39101,7 +38521,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_1/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39200,7 +38619,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_2/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39237,7 +38655,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_2/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39274,7 +38691,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_2/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39397,7 +38813,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_3/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39434,7 +38849,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_3/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39471,7 +38885,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_3/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39570,7 +38983,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_4/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39607,7 +39019,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_4/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39644,7 +39055,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_4/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39767,7 +39177,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/truediv/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39846,7 +39255,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39916,7 +39324,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_7/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -39995,7 +39402,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_9/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40074,7 +39480,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_10/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40153,7 +39558,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/add_12/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40232,7 +39636,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_5/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40269,7 +39672,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_5/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40306,7 +39708,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_5/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40405,7 +39806,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_6/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40442,7 +39842,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_6/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40479,7 +39878,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_6/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40602,7 +40000,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_7/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40639,7 +40036,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_7/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40676,7 +40072,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_7/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40775,7 +40170,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_8/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40812,7 +40206,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_8/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40849,7 +40242,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/strided_slice_8/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -40972,7 +40364,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/truediv_1/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -41051,7 +40442,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/auc_1/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -41121,7 +40511,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/GreaterEqual/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -41628,7 +41017,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/accuracy_1/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -41767,9 +41155,29 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/accuracy_1/Greater/y"
+  name: "linear/binary_logistic_head/metrics/accuracy_1/truediv"
+  op: "RealDiv"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/total/read"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/count/read"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/accuracy_1/zeros_like"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -41801,7 +41209,7 @@ node {
   name: "linear/binary_logistic_head/metrics/accuracy_1/Greater"
   op: "Greater"
   input: "linear/binary_logistic_head/metrics/accuracy_1/count/read"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/Greater/y"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/zeros_like"
   attr {
     key: "T"
     value {
@@ -41814,59 +41222,6 @@ node {
       list {
         shape {
         }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy_1/truediv"
-  op: "RealDiv"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/total/read"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/count/read"
-  input: "^add"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy_1/value/e"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
       }
     }
   }
@@ -41876,59 +41231,7 @@ node {
   op: "Select"
   input: "linear/binary_logistic_head/metrics/accuracy_1/Greater"
   input: "linear/binary_logistic_head/metrics/accuracy_1/truediv"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/value/e"
-  attr {
-    key: "T"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy_1/Greater_1/y"
-  op: "Const"
-  input: "^add"
-  attr {
-    key: "_output_shapes"
-    value {
-      list {
-        shape {
-        }
-      }
-    }
-  }
-  attr {
-    key: "dtype"
-    value {
-      type: DT_FLOAT
-    }
-  }
-  attr {
-    key: "value"
-    value {
-      tensor {
-        dtype: DT_FLOAT
-        tensor_shape {
-        }
-        float_val: 0.0
-      }
-    }
-  }
-}
-node {
-  name: "linear/binary_logistic_head/metrics/accuracy_1/Greater_1"
-  op: "Greater"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/AssignAdd_1"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/Greater_1/y"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/zeros_like"
   attr {
     key: "T"
     value {
@@ -41967,9 +41270,8 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/accuracy_1/update_op/e"
+  name: "linear/binary_logistic_head/metrics/accuracy_1/zeros_like_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -41998,11 +41300,32 @@ node {
   }
 }
 node {
+  name: "linear/binary_logistic_head/metrics/accuracy_1/Greater_1"
+  op: "Greater"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/AssignAdd_1"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/zeros_like_1"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+        }
+      }
+    }
+  }
+}
+node {
   name: "linear/binary_logistic_head/metrics/accuracy_1/update_op"
   op: "Select"
   input: "linear/binary_logistic_head/metrics/accuracy_1/Greater_1"
   input: "linear/binary_logistic_head/metrics/accuracy_1/truediv_1"
-  input: "linear/binary_logistic_head/metrics/accuracy_1/update_op/e"
+  input: "linear/binary_logistic_head/metrics/accuracy_1/zeros_like_1"
   attr {
     key: "T"
     value {
@@ -42022,7 +41345,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Cast/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42080,7 +41402,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42144,7 +41465,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42175,7 +41495,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42206,7 +41525,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42320,7 +41638,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -42355,7 +41672,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -42387,7 +41703,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -42419,7 +41734,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -42445,6 +41759,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/precision_at_thresholds/Cast/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -42554,34 +41896,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
@@ -42642,7 +41956,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Cast_1/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42700,7 +42013,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42764,7 +42076,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42795,7 +42106,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42826,7 +42136,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -42940,7 +42249,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -42975,7 +42283,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -43007,7 +42314,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -43039,7 +42345,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -43065,6 +42370,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/precision_at_thresholds/Cast_1/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -43174,34 +42507,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
@@ -43263,7 +42568,6 @@ node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Cast_2"
   op: "Cast"
   input: "DecodeCSV"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_greater_equal/Assert/AssertGuard/Merge"
   input: "^linear/binary_logistic_head/metrics/precision_at_thresholds/assert_less_equal/Assert/AssertGuard/Merge"
   attr {
@@ -43297,7 +42601,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43367,7 +42670,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43466,7 +42768,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43503,7 +42804,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43540,7 +42840,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43636,7 +42935,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43673,7 +42971,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43743,7 +43040,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43863,7 +43159,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/transpose/sub/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43915,7 +43210,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/transpose/Range/start"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -43946,7 +43240,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/transpose/Range/delta"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -44059,7 +43352,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Tile_1/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -44156,7 +43448,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Tile_2/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -44470,7 +43761,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Sum/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -44799,7 +44089,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/Sum_1/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -44904,7 +44193,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/add/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45007,7 +44295,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/precision_at_thresholds/add_2/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45164,7 +44451,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Cast/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45222,7 +44508,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45286,7 +44571,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45317,7 +44601,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45348,7 +44631,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45462,7 +44744,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -45497,7 +44778,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -45529,7 +44809,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -45561,7 +44840,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -45587,6 +44865,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/recall_at_thresholds/Cast/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -45696,34 +45002,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/switch_f"
@@ -45784,7 +45062,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Cast_1/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45842,7 +45119,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45906,7 +45182,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45937,7 +45212,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/Const_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -45968,7 +45242,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/Const_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46082,7 +45355,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/NoOp"
   op: "NoOp"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_t"
 }
 node {
@@ -46117,7 +45389,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_0"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -46149,7 +45420,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_1"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -46181,7 +45451,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_3"
   op: "Const"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
   attr {
     key: "_output_shapes"
@@ -46207,6 +45476,34 @@ node {
         }
         string_val: "y (linear/binary_logistic_head/metrics/recall_at_thresholds/Cast_1/x:0) = "
       }
+    }
+  }
+}
+node {
+  name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert"
+  op: "Assert"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_0"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_1"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_3"
+  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
+  attr {
+    key: "T"
+    value {
+      list {
+        type: DT_STRING
+        type: DT_STRING
+        type: DT_FLOAT
+        type: DT_STRING
+        type: DT_FLOAT
+      }
+    }
+  }
+  attr {
+    key: "summarize"
+    value {
+      i: 3
     }
   }
 }
@@ -46316,34 +45613,6 @@ node {
   }
 }
 node {
-  name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert"
-  op: "Assert"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_0"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_1"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_1"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/data_3"
-  input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Assert/Switch_2"
-  attr {
-    key: "T"
-    value {
-      list {
-        type: DT_STRING
-        type: DT_STRING
-        type: DT_FLOAT
-        type: DT_STRING
-        type: DT_FLOAT
-      }
-    }
-  }
-  attr {
-    key: "summarize"
-    value {
-      i: 3
-    }
-  }
-}
-node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/control_dependency_1"
   op: "Identity"
   input: "linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/switch_f"
@@ -46405,7 +45674,6 @@ node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Cast_2"
   op: "Cast"
   input: "DecodeCSV"
-  input: "^add"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_greater_equal/Assert/AssertGuard/Merge"
   input: "^linear/binary_logistic_head/metrics/recall_at_thresholds/assert_less_equal/Assert/AssertGuard/Merge"
   attr {
@@ -46439,7 +45707,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Reshape/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46509,7 +45776,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Reshape_1/shape"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46608,7 +45874,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46645,7 +45910,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46682,7 +45946,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46778,7 +46041,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Const"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46815,7 +46077,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -46885,7 +46146,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/stack/0"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47005,7 +46265,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/transpose/sub/y"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47057,7 +46316,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/transpose/Range/start"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47088,7 +46346,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/transpose/Range/delta"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47201,7 +46458,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Tile_1/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47318,7 +46574,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Tile_2/multiples"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47612,7 +46867,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Sum/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -47941,7 +47195,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/Sum_1/reduction_indices"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48046,7 +47299,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/add/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48149,7 +47401,6 @@ node {
 node {
   name: "linear/binary_logistic_head/metrics/recall_at_thresholds/add_2/x"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48335,7 +47586,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/strided_slice/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48372,7 +47622,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/strided_slice/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48409,7 +47658,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/strided_slice/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48534,7 +47782,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/strided_slice_1/stack"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48571,7 +47818,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/strided_slice_1/stack_1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48608,7 +47854,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/strided_slice_1/stack_2"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48704,7 +47949,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/range/start"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48735,7 +47979,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/range/delta"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48791,7 +48034,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/ExpandDims/dim"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -48855,7 +48097,6 @@ node {
 node {
   name: "linear/binary_logistic_head/_classification_output_alternatives/Tile/multiples/1"
   op: "Const"
-  input: "^add"
   attr {
     key: "_output_shapes"
     value {
@@ -51314,7 +50555,7 @@ node {
   attr {
     key: "begin_mask"
     value {
-      i: 1
+      i: 0
     }
   }
   attr {
@@ -51482,7 +50723,7 @@ node {
             size: 1
           }
         }
-        int_val: 1
+        int_val: 0
       }
     }
   }
@@ -51595,6 +50836,216 @@ node {
   attr {
     key: "begin_mask"
     value {
+      i: 1
+    }
+  }
+  attr {
+    key: "ellipsis_mask"
+    value {
+      i: 0
+    }
+  }
+  attr {
+    key: "end_mask"
+    value {
+      i: 0
+    }
+  }
+  attr {
+    key: "new_axis_mask"
+    value {
+      i: 0
+    }
+  }
+  attr {
+    key: "shrink_axis_mask"
+    value {
+      i: 0
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/boolean_mask/Shape_2"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 66
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/boolean_mask/strided_slice_2/stack"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 1
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/boolean_mask/strided_slice_2/stack_1"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 0
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/boolean_mask/strided_slice_2/stack_2"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 1
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables/boolean_mask/strided_slice_2"
+  op: "StridedSlice"
+  input: "report_uninitialized_variables/boolean_mask/Shape_2"
+  input: "report_uninitialized_variables/boolean_mask/strided_slice_2/stack"
+  input: "report_uninitialized_variables/boolean_mask/strided_slice_2/stack_1"
+  input: "report_uninitialized_variables/boolean_mask/strided_slice_2/stack_2"
+  device: "/device:CPU:0"
+  attr {
+    key: "Index"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "T"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "begin_mask"
+    value {
       i: 0
     }
   }
@@ -51624,7 +51075,7 @@ node {
   }
 }
 node {
-  name: "report_uninitialized_variables/boolean_mask/concat/values_0"
+  name: "report_uninitialized_variables/boolean_mask/concat/values_1"
   op: "Pack"
   input: "report_uninitialized_variables/boolean_mask/Prod"
   device: "/device:CPU:0"
@@ -51693,14 +51144,15 @@ node {
 node {
   name: "report_uninitialized_variables/boolean_mask/concat"
   op: "ConcatV2"
-  input: "report_uninitialized_variables/boolean_mask/concat/values_0"
   input: "report_uninitialized_variables/boolean_mask/strided_slice_1"
+  input: "report_uninitialized_variables/boolean_mask/concat/values_1"
+  input: "report_uninitialized_variables/boolean_mask/strided_slice_2"
   input: "report_uninitialized_variables/boolean_mask/concat/axis"
   device: "/device:CPU:0"
   attr {
     key: "N"
     value {
-      i: 2
+      i: 3
     }
   }
   attr {
@@ -51832,6 +51284,12 @@ node {
   op: "Where"
   input: "report_uninitialized_variables/boolean_mask/Reshape_1"
   device: "/device:CPU:0"
+  attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
   attr {
     key: "_output_shapes"
     value {
@@ -53490,7 +52948,7 @@ node {
   attr {
     key: "begin_mask"
     value {
-      i: 1
+      i: 0
     }
   }
   attr {
@@ -53658,7 +53116,7 @@ node {
             size: 1
           }
         }
-        int_val: 1
+        int_val: 0
       }
     }
   }
@@ -53771,6 +53229,216 @@ node {
   attr {
     key: "begin_mask"
     value {
+      i: 1
+    }
+  }
+  attr {
+    key: "ellipsis_mask"
+    value {
+      i: 0
+    }
+  }
+  attr {
+    key: "end_mask"
+    value {
+      i: 0
+    }
+  }
+  attr {
+    key: "new_axis_mask"
+    value {
+      i: 0
+    }
+  }
+  attr {
+    key: "shrink_axis_mask"
+    value {
+      i: 0
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/boolean_mask/Shape_2"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 40
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/boolean_mask/strided_slice_2/stack"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 1
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/boolean_mask/strided_slice_2/stack_1"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 0
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/boolean_mask/strided_slice_2/stack_2"
+  op: "Const"
+  device: "/device:CPU:0"
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+            size: 1
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "value"
+    value {
+      tensor {
+        dtype: DT_INT32
+        tensor_shape {
+          dim {
+            size: 1
+          }
+        }
+        int_val: 1
+      }
+    }
+  }
+}
+node {
+  name: "report_uninitialized_variables_1/boolean_mask/strided_slice_2"
+  op: "StridedSlice"
+  input: "report_uninitialized_variables_1/boolean_mask/Shape_2"
+  input: "report_uninitialized_variables_1/boolean_mask/strided_slice_2/stack"
+  input: "report_uninitialized_variables_1/boolean_mask/strided_slice_2/stack_1"
+  input: "report_uninitialized_variables_1/boolean_mask/strided_slice_2/stack_2"
+  device: "/device:CPU:0"
+  attr {
+    key: "Index"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "T"
+    value {
+      type: DT_INT32
+    }
+  }
+  attr {
+    key: "_output_shapes"
+    value {
+      list {
+        shape {
+          dim {
+          }
+        }
+      }
+    }
+  }
+  attr {
+    key: "begin_mask"
+    value {
       i: 0
     }
   }
@@ -53800,7 +53468,7 @@ node {
   }
 }
 node {
-  name: "report_uninitialized_variables_1/boolean_mask/concat/values_0"
+  name: "report_uninitialized_variables_1/boolean_mask/concat/values_1"
   op: "Pack"
   input: "report_uninitialized_variables_1/boolean_mask/Prod"
   device: "/device:CPU:0"
@@ -53869,14 +53537,15 @@ node {
 node {
   name: "report_uninitialized_variables_1/boolean_mask/concat"
   op: "ConcatV2"
-  input: "report_uninitialized_variables_1/boolean_mask/concat/values_0"
   input: "report_uninitialized_variables_1/boolean_mask/strided_slice_1"
+  input: "report_uninitialized_variables_1/boolean_mask/concat/values_1"
+  input: "report_uninitialized_variables_1/boolean_mask/strided_slice_2"
   input: "report_uninitialized_variables_1/boolean_mask/concat/axis"
   device: "/device:CPU:0"
   attr {
     key: "N"
     value {
-      i: 2
+      i: 3
     }
   }
   attr {
@@ -54009,6 +53678,12 @@ node {
   input: "report_uninitialized_variables_1/boolean_mask/Reshape_1"
   device: "/device:CPU:0"
   attr {
+    key: "T"
+    value {
+      type: DT_BOOL
+    }
+  }
+  attr {
     key: "_output_shapes"
     value {
       list {
@@ -54129,10 +53804,15 @@ node {
   input: "^linear/linear/lookup/hash_table/table_init"
 }
 node {
+  name: "init_3"
+  op: "NoOp"
+}
+node {
   name: "group_deps_1"
   op: "NoOp"
   input: "^init_2"
   input: "^init_all_tables"
+  input: "^init_3"
 }
 node {
   name: "Merge/MergeSummary"
@@ -54210,7 +53890,7 @@ node {
         dtype: DT_STRING
         tensor_shape {
         }
-        string_val: "_temp_fc837f3748044f14b5df1d57e90faf26/part"
+        string_val: "_temp_ccd4c8fb434f43b0b4096b57a16425d5/part"
       }
     }
   }
@@ -54275,6 +53955,7 @@ node {
 node {
   name: "save/ShardedFilename/shard"
   op: "Const"
+  device: "/device:CPU:0"
   attr {
     key: "_output_shapes"
     value {
@@ -54308,6 +53989,7 @@ node {
   input: "save/StringJoin"
   input: "save/ShardedFilename/shard"
   input: "save/num_shards"
+  device: "/device:CPU:0"
   attr {
     key: "_output_shapes"
     value {
@@ -54321,6 +54003,7 @@ node {
 node {
   name: "save/SaveV2/tensor_names"
   op: "Const"
+  device: "/device:CPU:0"
   attr {
     key: "_output_shapes"
     value {
@@ -54396,6 +54079,7 @@ node {
 node {
   name: "save/SaveV2/shape_and_slices"
   op: "Const"
+  device: "/device:CPU:0"
   attr {
     key: "_output_shapes"
     value {
@@ -54514,6 +54198,7 @@ node {
   input: "linear/taxiout/weight/part_0/read"
   input: "linear/binary_logistic_head/linear/taxiout/weight/part_0/Ftrl/read"
   input: "linear/binary_logistic_head/linear/taxiout/weight/part_0/Ftrl_1/read"
+  device: "/device:CPU:0"
   attr {
     key: "dtypes"
     value {
@@ -54567,6 +54252,7 @@ node {
   op: "Identity"
   input: "save/ShardedFilename"
   input: "^save/SaveV2"
+  device: "/device:CPU:0"
   attr {
     key: "T"
     value {
@@ -54596,6 +54282,7 @@ node {
   op: "Pack"
   input: "save/ShardedFilename"
   input: "^save/control_dependency"
+  device: "/device:CPU:0"
   attr {
     key: "N"
     value {
@@ -54632,6 +54319,7 @@ node {
   op: "MergeV2Checkpoints"
   input: "save/MergeV2Checkpoints/checkpoint_prefixes"
   input: "save/Const"
+  device: "/device:CPU:0"
   attr {
     key: "delete_old_dirs"
     value {
@@ -54645,6 +54333,7 @@ node {
   input: "save/Const"
   input: "^save/control_dependency"
   input: "^save/MergeV2Checkpoints"
+  device: "/device:CPU:0"
   attr {
     key: "T"
     value {
