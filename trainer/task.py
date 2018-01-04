@@ -26,11 +26,20 @@ if __name__ == '__main__':
       help='Eval data file(s)',
       required=True
     )
+    parser.add_argument(
+      '--job-dir',
+      help='specify job dir for ml engine job',
+      default='./junk'
+    )
     # parse args
     args = parser.parse_args()
     arguments  = args.__dict__
 
+    arguments.pop('job-dir', None)
+    arguments.pop('job_dir', None)
     output_dir = arguments.pop('output_dir')
+
+    # job_dir = arguments['job-dir']
 
     # run
     tf.logging.set_verbosity(tf.logging.INFO)

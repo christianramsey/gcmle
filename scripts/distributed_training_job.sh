@@ -13,7 +13,7 @@ JOBNAME=flights_$(date -u +%y%m%d_%H%M%S)
 gcloud ml-engine jobs submit training $JOBNAME \
   --region=$REGION \
   --module-name=trainer.task \
-  --package-path=$(pwd)../trainer \
+  --package-path=$(pwd) \
   --job-dir=$OUTPUT_DIR \
   --staging-bucket=gs://$BUCKET \
   --scale-tier=STANDARD_1 \
