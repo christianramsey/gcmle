@@ -74,7 +74,21 @@ def linear_model(output_dir):
     estimator.params["head"]._thresholds = [0.7]
     return estimator
 
+def dnn_model(output_dir):
+    real, sparse = get_features()
+    all = {}
+    all.update(real)
+    embed = {
+       colname : create_embed(col) \
+          for colname, col in sparse.items()
+    }
+    all.update(embed)
 
+    estimator = tflearn.DNNClassifier(model_dir=output_dir,
+                                      feature_columns=all.values(),
+                                      hidden_units=[64, 16, 4])
+    estimator.params["head"]._thresholds = [0.7]
+    return estimator
 
 
 
