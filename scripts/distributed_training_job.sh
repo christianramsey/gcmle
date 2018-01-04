@@ -17,6 +17,7 @@ gcloud ml-engine jobs submit training $JOBNAME \
   --job-dir=$OUTPUT_DIR \
   --staging-bucket=gs://$BUCKET \
   --scale-tier=STANDARD_1 \
+  -- \
    --output_dir=$OUTPUT_DIR \
    --traindata $DATA_DIR/train$PATTERN \
    --evaldata $DATA_DIR/test$PATTERN
