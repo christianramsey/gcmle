@@ -60,6 +60,11 @@ def get_features():
     return real, sparse
 
 
+def create_embed(sparse_col):
+    nbins = col.bucket_size
+    dim = 1 + int(round(np.log2(nbins)))
+    return tflayers.embedding_column(sparse_col, dimension=dim)
+
 def linear_model(output_dir):
     real, sparse = get_features()
     all = {}
@@ -68,6 +73,9 @@ def linear_model(output_dir):
     estimator = tflearn.LinearClassifier(model_dir=output_dir, feature_columns=all.values())
     estimator.params["head"]._thresholds = [0.7]
     return estimator
+
+
+
 
 
 def serving_input_fn():
