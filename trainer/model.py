@@ -64,7 +64,11 @@ def get_features():
 
 
 def create_embed(sparse_col):
-    nbins = sparse_col.bucket_size
+    dim = 5 # default
+    if hasattr(sparse_col, 'bucket_size'):
+       nbins = sparse_col.bucket_size
+       if nbins is not None:
+          dim = 1 + int(round(np.log2(nbins)))
     dim = 1 + int(round(np.log2(nbins)))
     return tflayers.embedding_column(sparse_col, dimension=dim)
 
