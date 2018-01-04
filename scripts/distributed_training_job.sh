@@ -2,6 +2,15 @@
 
 !/bin/bash
 
+# run locally
+python task.py \
+       --traindata ../data/train.csv \
+       --output_dir ../trained_model \
+       --evaldata ../data/test.csv
+
+
+
+
 PATTERN="Flights-00001*"
 
 

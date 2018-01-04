@@ -1,8 +1,11 @@
+import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.layers as tflayers
 import tensorflow.contrib.learn as tflearn
 from tensorflow.contrib.learn.python.learn.utils import saved_model_export_utils
 import tensorflow.contrib.metrics as tfmetrics
+
+
 
 # our data doesn't have column names or an explicit y,
 # we will define the header here to get ready to ingest the data
@@ -61,7 +64,7 @@ def get_features():
 
 
 def create_embed(sparse_col):
-    nbins = col.bucket_size
+    nbins = sparse_col.bucket_size
     dim = 1 + int(round(np.log2(nbins)))
     return tflayers.embedding_column(sparse_col, dimension=dim)
 
@@ -152,7 +155,7 @@ def make_experiment_fn(traindata, evaldata, **args):
   def _experiment_fn(output_dir):
 
     return tflearn.Experiment(
-        linear_model(output_dir),
+        dnn_model(output_dir),
         train_input_fn=read_dataset(traindata,
         mode=tf.contrib.learn.ModeKeys.TRAIN),
         eval_input_fn=read_dataset(evaldata),
