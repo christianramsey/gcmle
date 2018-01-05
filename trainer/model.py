@@ -131,6 +131,14 @@ def deep_and_wide(output_dir, buckets):
     sparse['ori_dest'] = tflayers.crossed_column([sparse['origin'],
                                                   sparse['dest']], hash_bucket_size = 1000)
 
+    # create embeddings of all the sparse columns
+    embed = {
+       colname : create_embed(col) \
+          for colname, col in sparse.items()
+    }
+
+
+
 
 def serving_input_fn():
     real, sparse = get_features()
