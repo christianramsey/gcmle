@@ -20,7 +20,7 @@ DEFAULTS     = [[0.0],[0.0],[0.0],[0.0],[0.0],[0.0], ['na'],[0.0],[0.0],[0.0],[0
 
 # a function to read the training and eval dataset, which will give us batch_size examples each time,
 # which goes through the dataset num_training_epochs times. the modekeys allows us to make conditional since
-# we only want to run through the code once in evaluation
+# we only w`ant to run through the code once in evaluation
 def read_dataset(filename, mode=tf.contrib.learn.ModeKeys.EVAL, batch_size=512, num_training_epochs=10):
     # the actual input function passed to TensorFlow
     def _input_fn():
@@ -68,8 +68,8 @@ def create_embed(sparse_col):
     if hasattr(sparse_col, 'bucket_size'):
        nbins = sparse_col.bucket_size
        if nbins is not None:
-          dim = 1 + int(round(np.log2(nbins)))
-    dim = 1 + int(round(np.log2(nbins)))
+        print(nbins)
+        dim = 1 + int(round(np.log2(nbins) ) )
     return tflayers.embedding_column(sparse_col, dimension=dim)
 
 def linear_model(output_dir):
