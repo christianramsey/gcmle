@@ -60,6 +60,18 @@ def get_features():
       'dest'   : tflayers.sparse_column_with_hash_bucket('dest',
                  hash_bucket_size=1000)  # FIXME
     }
+
+    latbuckets = np.linspace(20.0, 50.0, nbuckets).tolist()  # USA
+    lonbuckets = np.linspace(-120.0, -70.0, nbuckets).tolist()  # USA
+    disc = {}
+    disc.update({
+        'd_{}'.format(key): tflayers.bucketized_column(real[key], latbuckets) \
+        for key in ['dep_lat', 'arr_lat']
+    })
+    disc.update({
+        'd_{}'.format(key): tflayers.bucketized_column(real[key], lonbuckets) \
+        for key in ['dep_lon', 'arr_lon']
+    })
     return real, sparse
 
 
