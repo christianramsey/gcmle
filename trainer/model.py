@@ -61,17 +61,6 @@ def get_features():
                  hash_bucket_size=1000)  # FIXME
     }
 
-    latbuckets = np.linspace(20.0, 50.0, nbuckets).tolist()  # USA
-    lonbuckets = np.linspace(-120.0, -70.0, nbuckets).tolist()  # USA
-    disc = {}
-    disc.update({
-        'd_{}'.format(key): tflayers.bucketized_column(real[key], latbuckets) \
-        for key in ['dep_lat', 'arr_lat']
-    })
-    disc.update({
-        'd_{}'.format(key): tflayers.bucketized_column(real[key], lonbuckets) \
-        for key in ['dep_lon', 'arr_lon']
-    })
     return real, sparse
 
 
@@ -109,8 +98,29 @@ def dnn_model(output_dir):
     estimator.params["head"]._thresholds = [0.7]
     return estimator
 
+def deep_and_wide(output_dir, buckets):
+    real, sparse = get_features()
+
+    nbuckets = 4 # defaults
+    if buckets != None:
+        nbuckets = buckets
+
+    # bucketise/discretise lat and lon to nbuckets
+    latbuckets = np.linspace(20.0, 50.0, nbuckets).tolist()  # USA
+    lonbuckets = np.linspace(-120.0, -70.0, nbuckets).tolist()  # USA
 
 
+    disc = {}
+    disc.update({
+        'd_{}'.format(key): tflayers.bucketized_column(real[key], latbuckets) \
+        for key in ['dep_lat', 'arr_lat']
+    })
+    disc.update({
+        'd_{}'.format(key): tflayers.bucketized_column(real[key], lonbuckets) \
+        for key in ['dep_lon', 'arr_lon']
+    })
+
+    
 def serving_input_fn():
     real, sparse = get_features()
 
@@ -133,7 +143,6 @@ def serving_input_fn():
         features,
         None,
         feature_placeholders)
-
 
 def serving_input_fn():
     real, sparse = get_features()
