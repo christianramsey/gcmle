@@ -98,7 +98,7 @@ def dnn_model(output_dir):
     estimator.params["head"]._thresholds = [0.7]
     return estimator
 
-def deep_and_wide(output_dir, buckets):
+def wide_and_deep(output_dir, buckets):
     real, sparse = get_features()
 
     nbuckets = 4 # defaults
@@ -120,7 +120,7 @@ def deep_and_wide(output_dir, buckets):
         for key in ['dep_lon', 'arr_lon']
     })
 
-    # cross
+    # cross columns for new features
     sparse['dep_loc'] = tflayers.crossed_column([disc['d_dep_lat'],
                                                  disc['d_dep_lon']], nbuckets * nbuckets)
     sparse['arr_loc'] = tflayers.crossed_column([disc['d_arr_lat'],
@@ -136,8 +136,6 @@ def deep_and_wide(output_dir, buckets):
        colname : create_embed(col) \
           for colname, col in sparse.items()
     }
-
-
 
     estimator = \
         tflearn.DNNLinearCombinedClassifier(model_dir=output_dir,
@@ -206,7 +204,7 @@ def make_experiment_fn(traindata, evaldata, **args):
   def _experiment_fn(output_dir):
 
     return tflearn.Experiment(
-        dnn_model(output_dir),
+        wide_and_deep(output_dir),
         train_input_fn=read_dataset(traindata,
         mode=tf.contrib.learn.ModeKeys.TRAIN),
         eval_input_fn=read_dataset(evaldata),
