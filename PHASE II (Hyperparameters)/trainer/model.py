@@ -212,7 +212,8 @@ def make_experiment_fn(traindata, evaldata, **args):
         eval_input_fn=read_dataset(evaldata),
         eval_metrics={
             'rmse': tflearn.MetricSpec(metric_fn=my_rmse,
-                                       prediction_key='probabilities')
+                                       prediction_key='probabilities'),
+            'training/hptuning/metric' : tflearn.MetricSpec(metric_fn=my_rmse, prediction_key='probabilities')
         },
         export_strategies=[saved_model_export_utils.make_export_strategy(
             serving_input_fn,
