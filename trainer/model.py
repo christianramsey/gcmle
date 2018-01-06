@@ -136,13 +136,16 @@ def wide_and_deep(output_dir, buckets):
        colname : create_embed(col) \
           for colname, col in sparse.items()
     }
+    sparse.update(embed)
 
-    estimator = \
-        tflearn.DNNLinearCombinedClassifier(model_dir=output_dir,
-                                            linear_feature_columns=sparse.values(),
-                                            dnn_feature_columns=real.values(),
-                                            hidden_units=[64, 16, 4])                                      hidden_units=[64, 16, 4])
+    estimator = tflearn.DNNLinearCombinedClassifier(model_dir=output_dir,
+                                                    linear_feature_columns= sparse.values(),
+                                                    dnn_feature_columns=real.values(), dnn_hidden_units = [64, 12, 4])
+
+
     estimator.params["head"]._thresholds = [0.7]
+
+
     return estimator
 
 def serving_input_fn():
@@ -204,7 +207,7 @@ def make_experiment_fn(traindata, evaldata, **args):
   def _experiment_fn(output_dir):
 
     return tflearn.Experiment(
-        wide_and_deep(output_dir),
+        wide_and_deep(output_dir, 5),
         train_input_fn=read_dataset(traindata,
         mode=tf.contrib.learn.ModeKeys.TRAIN),
         eval_input_fn=read_dataset(evaldata),
