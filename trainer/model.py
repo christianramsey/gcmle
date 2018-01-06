@@ -139,9 +139,8 @@ def wide_and_deep(output_dir, buckets):
     sparse.update(embed)
 
     estimator = tflearn.DNNLinearCombinedClassifier(model_dir=output_dir,
-                                                    linear_feature_columns= sparse.values(),
-                                                    dnn_feature_columns=real.values(), dnn_hidden_units = [64, 12, 4])
-
+                                                    linear_feature_columns= real.values(),
+                                                    dnn_feature_columns=sparse.values(), dnn_hidden_units = [64, 12, 4])
 
     estimator.params["head"]._thresholds = [0.7]
 
