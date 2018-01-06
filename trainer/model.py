@@ -130,7 +130,7 @@ def wide_and_deep(output_dir, buckets):
                                                  sparse['arr_loc']], nbuckets ** 4)
     sparse['ori_dest'] = tflayers.crossed_column([sparse['origin'],
                                                   sparse['dest']], hash_bucket_size = 1000)
-
+    # checkpoint
     # create embeddings of all the sparse columns
     embed = {
        colname : create_embed(col) \
