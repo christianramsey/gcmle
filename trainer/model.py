@@ -136,7 +136,7 @@ def wide_and_deep(output_dir, buckets):
        colname : create_embed(col) \
           for colname, col in sparse.items()
     }
-    sparse.update(embed)
+    real.update(embed)
 
     estimator = tflearn.DNNLinearCombinedClassifier(model_dir=output_dir,
                                                     linear_feature_columns= sparse.values(),
