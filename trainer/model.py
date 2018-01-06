@@ -121,15 +121,15 @@ def wide_and_deep(output_dir, buckets):
     })
 
     # cross columns for new features
-    # sparse['dep_loc'] = tflayers.crossed_column([disc['d_dep_lat'],
-    #                                              disc['d_dep_lon']], nbuckets * nbuckets)
-    # sparse['arr_loc'] = tflayers.crossed_column([disc['d_arr_lat'],
-    #                                              disc['d_arr_lon']], nbuckets * nbuckets)
-    #
-    # sparse['dep_arr'] = tflayers.crossed_column([sparse['dep_loc'],
-    #                                              sparse['arr_loc']], nbuckets ** 4)
-    # sparse['ori_dest'] = tflayers.crossed_column([sparse['origin'],
-    #                                               sparse['dest']], hash_bucket_size = 1000)
+    sparse['dep_loc'] = tflayers.crossed_column([disc['d_dep_lat'],
+                                                 disc['d_dep_lon']], nbuckets * nbuckets)
+    sparse['arr_loc'] = tflayers.crossed_column([disc['d_arr_lat'],
+                                                 disc['d_arr_lon']], nbuckets * nbuckets)
+
+    sparse['dep_arr'] = tflayers.crossed_column([sparse['dep_loc'],
+                                                 sparse['arr_loc']], nbuckets ** 4)
+    sparse['ori_dest'] = tflayers.crossed_column([sparse['origin'],
+                                                  sparse['dest']], hash_bucket_size = 1000)
 
     # create embeddings of all the sparse columns
     embed = {
