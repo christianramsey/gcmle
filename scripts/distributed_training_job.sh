@@ -1,3 +1,4 @@
+#  distributed_training_job.sh
 #!/usr/bin/env bash
 
 !/bin/bash
@@ -50,4 +51,3 @@ gcloud ml-engine jobs submit training $JOBNAME \
    --output_dir=$OUTPUT_DIR \
    --traindata $DATA_DIR/train$PATTERN \
    --evaldata $DATA_DIR/test$PATTERN
-

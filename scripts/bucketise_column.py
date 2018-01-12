@@ -1,3 +1,4 @@
+# bucketise_column
 import numpy as np; import tensorflow as tf;
 import tensorflow.contrib.layers as tflayers
 
@@ -11,4 +12,3 @@ x2 = tflayers.bucketized_column(x, buckets)
 import pandas as pd
 
 print(x2)
-

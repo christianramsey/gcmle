@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ml commands
 
 # test out train command
 python task.py --traindata ~/data/train.csv
